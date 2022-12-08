@@ -83,8 +83,7 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 			}
 			else{
-				String s = message.getMessage();
-				sendToAllClients(s);
+				sendToAllClients(message);
 				//add code here to send received message to all clients.
 				//The string we received in the message is the message we will send back to all clients subscribed.
 				//Example:
