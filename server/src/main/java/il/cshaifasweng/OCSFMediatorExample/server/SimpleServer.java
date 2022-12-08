@@ -4,7 +4,8 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -13,7 +14,7 @@ public class SimpleServer extends AbstractServer {
 
 	public SimpleServer(int port) {
 		super(port);
-		
+
 	}
 
 	@Override
@@ -30,7 +31,7 @@ public class SimpleServer extends AbstractServer {
 			// the IDs at data field in Message entity and send back to all subscribed clients a request to update
 			//their IDs text fields. An example of use of observer design pattern.
 			//message format: "change submitters IDs: 123456789, 987654321"
-			else if(request.startsWith("change submitters IDs:")){
+			else if(request.startsWith("change submitters IDs: ")){
 				message.setData(request.substring(23));
 				message.setMessage("update submitters IDs");
 				sendToAllClients(message);
@@ -48,24 +49,46 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("send Submitters IDs")){
-				//add code here to send submitters IDs to client
+				message.setMessage("313598484, 308283886");
+				client.sendToClient(message);
 			}
 			else if (request.startsWith("send Submitters")){
-				//add code here to send submitters names to client
+				message.setMessage("Yuval Fisher, Or Meir");
+				client.sendToClient(message);
 			}
 			else if (request.equals("what day it is?")) {
-				//add code here to send the date to client
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+				Date date = new Date();
+				message.setMessage(formatter.format(date));
+				client.sendToClient(message);
 			}
 			else if (request.startsWith("add")){
-				//add code here to sum 2 numbers received in the message and send result back to client
-				//(use substring method as shown above)
-				//message format: "add n+m"
-			}else{
+				String s;
+				int i = 4, n = 0, m = 0, sum;
+				s = message.getMessage();
+				while (s.charAt(i) != '+')
+				{
+					n = n * 10;
+					n = n + (s.charAt(i) - '0');
+					i++;
+				}
+				i++;
+				while (i < s.length()) {
+					m = m * 10;
+					m = m + (s.charAt(i) - '0');
+					i++;
+				}
+				sum = n + m;
+				message.setMessage(String.valueOf(sum));
+				client.sendToClient(message);
+			}
+			else{
+				sendToAllClients(message);
 				//add code here to send received message to all clients.
 				//The string we received in the message is the message we will send back to all clients subscribed.
 				//Example:
-					// message received: "Good morning"
-					// message sent: "Good morning"
+				// message received: "Good morning"
+				// message sent: "Good morning"
 				//see code for changing submitters IDs for help
 			}
 		} catch (IOException e1) {
