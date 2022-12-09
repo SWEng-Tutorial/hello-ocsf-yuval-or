@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Vector;
+import static java.lang.Character.isDigit;
 
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
@@ -63,23 +65,35 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 			}
 			else if (request.startsWith("add")){
-				String s;
-				int i = 4, n = 0, m = 0, sum;
-				s = message.getMessage();
-				while (s.charAt(i) != '+')
+				Vector<Integer> nums =  new Vector<Integer>(2);
+				int j,k=0;
+				int posOrNeg1 = 1;
+				int posOrNeg2 = 1;
+
+				for(int i = 0 ; i<request.length(); i++)
 				{
-					n = n * 10;
-					n = n + (s.charAt(i) - '0');
-					i++;
+					if(isDigit(request.charAt(i)))
+					{
+						if(i-1 >= 0 && request.charAt(i-1)=='-')
+						{
+							if(nums.isEmpty())
+							{
+								posOrNeg1 = -1;
+							}
+							else
+							{
+								posOrNeg2 = -1;
+							}
+						}
+						
+						for(j = i ; j<request.length() && isDigit(request.charAt(j))  ; j++ ){}
+						String s = request.substring(i,j);
+						nums.add(Integer.parseInt(s));
+						i=j;
+					}
 				}
-				i++;
-				while (i < s.length()) {
-					m = m * 10;
-					m = m + (s.charAt(i) - '0');
-					i++;
-				}
-				sum = n + m;
-				message.setMessage(String.valueOf(sum));
+				int answer = (posOrNeg1*nums.get(0)) + (posOrNeg2*nums.get(1));
+				message.setMessage(Integer.toString(answer));
 				client.sendToClient(message);
 			}
 			else{
